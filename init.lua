@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -102,7 +102,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -174,7 +174,9 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-
+-- Mappings for opening terminal splits horizontally and vertically
+vim.keymap.set('n', '<leader>tt', '<C-w>s8<C-w>-<cmd>terminal<CR>i', { desc = 'Create horizontal terminal split' })
+vim.keymap.set('n', '<leader>tv', '<C-w>v25<C-w><<cmd>terminal<CR>i', { desc = 'Create vertical terminal split' })
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -201,6 +203,24 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.highlight.on_yank()
+  end,
+})
+
+-- Autocommand to configure the terminal
+vim.api.nvim_create_autocmd('TermOpen', {
+  desc = 'Format terminal window',
+  group = vim.api.nvim_create_augroup('format-terminal', { clear = true }),
+  command = 'setlocal nonumber norelativenumber signcolumn=no',
+})
+-- Autocommand to enter insert mode whenever terminal is focused
+vim.api.nvim_create_autocmd('BufEnter', {
+  desc = 'Enter insert mode on terminal focus',
+  group = vim.api.nvim_create_augroup('focus-terminal', { clear = true }),
+  callback = function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    if vim.bo[bufnr].buftype == 'terminal' then
+      vim.cmd 'startinsert'
+    end
   end,
 })
 
@@ -286,7 +306,7 @@ require('lazy').setup({
         ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
         ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
         ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-        ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
+        ['<leader>t'] = { name = '[T]oggle or [T]erminal', _ = 'which_key_ignore' },
         ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
       }
       -- visual mode
