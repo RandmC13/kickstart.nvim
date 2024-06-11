@@ -299,12 +299,23 @@ require('lazy').setup({
 
         -- Actions
         map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'Stage Hunk' })
+        map('n', '<leader>hu', gitsigns.undo_stage_hunk, { desc = 'Undo Stage Hunk' })
         map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'Reset Hunk' })
         map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'Preview Hunk' })
         map('n', '<leader>hd', gitsigns.diffthis, { desc = 'Show Git Diff' })
         map('n', '<leader>hb', function()
           gitsigns.blame_line { full = true }
         end, { desc = 'Show blame line' })
+        map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'Stage Buffer' })
+        map('n', '<leader>hR', gitsigns.reset_buffer)
+        map('v', '<leader>hs', function()
+          gitsigns.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
+        end, { desc = 'Stage Hunk' })
+        map('v', '<leader>hr', function()
+          gitsigns.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
+        end, { desc = 'Reset Hunk' })
+        map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = 'Toggle Line Blame' })
+        map('n', '<leader>td', gitsigns.toggle_deleted, { desc = 'Toggle Deleted' })
       end,
     },
   },
