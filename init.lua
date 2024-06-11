@@ -193,11 +193,8 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- [[ Basic Autocommands ]]
---  See `:help lua-guide-autocommands`
 
 -- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
@@ -206,13 +203,13 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
--- Autocommand to configure the terminal
+-- Configure the terminal
 vim.api.nvim_create_autocmd('TermOpen', {
   desc = 'Format terminal window',
   group = vim.api.nvim_create_augroup('format-terminal', { clear = true }),
   command = 'setlocal nonumber norelativenumber signcolumn=no',
 })
--- Autocommand to enter insert mode whenever terminal is focused
+-- Enter insert mode whenever terminal is focused
 vim.api.nvim_create_autocmd('BufEnter', {
   desc = 'Enter insert mode on terminal focus',
   group = vim.api.nvim_create_augroup('focus-terminal', { clear = true }),
@@ -225,7 +222,6 @@ vim.api.nvim_create_autocmd('BufEnter', {
 })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
---    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
@@ -271,10 +267,45 @@ require('lazy').setup({
       signs = {
         add = { text = '+' },
         change = { text = '~' },
-        delete = { text = '_' },
-        topdelete = { text = '‾' },
+        delete = { text = '-' },
+        topdelete = { text = '-' },
         changedelete = { text = '~' },
       },
+      on_attach = function(bufnr)
+        local gitsigns = require 'gitsigns'
+
+        local function map(mode, l, r, opts)
+          opts = opts or {}
+          opts.buffer = bufnr
+          vim.keymap.set(mode, l, r, opts)
+        end
+
+        -- Navigation
+        map('n', ']c', function()
+          if vim.wo.diff then
+            vim.cmd.normal { ']c', bang = true }
+          else
+            gitsigns.nav_hunk 'next'
+          end
+        end, { desc = 'Navigate to next git diff' })
+
+        map('n', '[c', function()
+          if vim.wo.diff then
+            vim.cmd.normal { '[c', bang = true }
+          else
+            gitsigns.nav_hunk 'prev'
+          end
+        end, { desc = 'Navigate to previous git diff' })
+
+        -- Actions
+        map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'Stage Hunk' })
+        map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'Reset Hunk' })
+        map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'Preview Hunk' })
+        map('n', '<leader>hd', gitsigns.diffthis, { desc = 'Show Git Diff' })
+        map('n', '<leader>hb', function()
+          gitsigns.blame_line { full = true }
+        end, { desc = 'Show blame line' })
+      end,
     },
   },
 
