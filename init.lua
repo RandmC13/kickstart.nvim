@@ -103,7 +103,6 @@ vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = true
-
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
 
@@ -117,7 +116,11 @@ vim.opt.clipboard = 'unnamedplus'
 
 -- Enable break indent
 vim.opt.breakindent = true
-
+vim.o.expandtab = true
+vim.o.shiftwidth = 4
+vim.o.tabstop = 4
+vim.o.softtabstop = 4
+-- vim.o.smartindent = true
 -- Save undo history
 vim.opt.undofile = true
 
@@ -143,8 +146,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', lead = '·' }
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
 
@@ -154,12 +156,18 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- Set pum height (code completion)
+vim.opt.pumheight = 8
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+-- Strip whitespace when pasting
+vim.keymap.set('n', 'p', 'p<Cmd>%s/\\r$/<CR>')
+vim.keymap.set('v', 'p', 'p<Cmd>%s/\\r$/<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
@@ -307,7 +315,7 @@ require('lazy').setup({
           gitsigns.blame_line { full = true }
         end, { desc = 'Show blame line' })
         map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'Stage Buffer' })
-        map('n', '<leader>hR', gitsigns.reset_buffer)
+        map('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'Reset Buffer' })
         map('v', '<leader>hs', function()
           gitsigns.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
         end, { desc = 'Stage Hunk' })
@@ -627,9 +635,9 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -669,6 +677,8 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'black', -- Python linting
+        'isort',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -715,8 +725,7 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
+        python = { 'isort', 'black' },
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
         -- javascript = { { "prettierd", "prettier" } },
@@ -787,7 +796,14 @@ require('lazy').setup({
           -- Scroll the documentation window [b]ack / [f]orward
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
-
+          -- Close and open the documentation
+          ['<C-g>'] = function()
+            if cmp.visible_docs() == true then
+              cmp.close_docs()
+            elseif cmp.visible_docs ~= true then
+              cmp.open_docs()
+            end
+          end,
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
@@ -822,7 +838,6 @@ require('lazy').setup({
               luasnip.jump(-1)
             end
           end, { 'i', 's' }),
-
           -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
@@ -842,6 +857,7 @@ require('lazy').setup({
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
+    lazy = false,
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
@@ -849,8 +865,10 @@ require('lazy').setup({
       vim.cmd.colorscheme 'tokyonight-night'
 
       -- You can configure highlights by doing something like:
+      vim.o.background = 'dark'
       vim.cmd.hi 'Comment gui=none'
     end,
+    opts = {},
   },
 
   -- Highlight todo, notes, etc in comments
@@ -925,6 +943,20 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
+  -- Add context line detailing which function is being edited
+  {
+    'nvim-treesitter/nvim-treesitter-context',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    opts = {
+      max_lines = 5,
+      multiline_threshold = 2,
+    },
+  },
+  -- Remember last cursor position
+  {
+    'vladdoster/remember.nvim',
+    opts = {},
+  },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -938,8 +970,10 @@ require('lazy').setup({
   -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  -- Autopairs parentheses and other useful characters
+  require 'kickstart.plugins.autopairs',
+  -- File tree
+  require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
