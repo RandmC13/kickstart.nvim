@@ -81,8 +81,8 @@ vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Strip whitespace when pasting
-vim.keymap.set('n', 'p', 'p<Cmd>%s/\\r$/<CR>')
-vim.keymap.set('v', 'p', 'p<Cmd>%s/\\r$/<CR>')
+vim.keymap.set('n', 'p', 'p<Cmd>%s/\\r$/<CR>', { desc = 'Paste' })
+vim.keymap.set('v', 'p', 'p<Cmd>%s/\\r$/<CR>', { desc = 'Paste' })
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })

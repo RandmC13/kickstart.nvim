@@ -64,6 +64,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     -- Enable Telescope extensions if they are installed
     pcall(require('telescope').load_extension, 'fzf')
     pcall(require('telescope').load_extension, 'ui-select')
+    pcall(require('telescope').load_extension, 'projects')
 
     -- See `:help telescope.builtin`
     local builtin = require 'telescope.builtin'
@@ -102,4 +103,8 @@ return { -- Fuzzy Finder (files, lsp, etc)
       builtin.find_files { cwd = vim.fn.stdpath 'config' }
     end, { desc = '[S]earch [N]eovim files' })
   end,
+  -- Shortcut for selecting project
+  vim.keymap.set('n', '<leader>p', function()
+    require('telescope').extensions.projects.projects {}
+  end, { desc = 'Select [P]roject' }),
 }
