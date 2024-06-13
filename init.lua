@@ -58,7 +58,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', lead = '·' }
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 -- Set gui colours
 vim.opt.termguicolors = true
 
@@ -69,7 +69,7 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 8
 
 -- Set pum height (code completion)
 vim.opt.pumheight = 8

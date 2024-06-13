@@ -135,6 +135,11 @@ return { -- LSP Configuration & Plugins
             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
           end, '[T]oggle Inlay [H]ints')
         end
+
+        -- Enable header switching keybind if clangd is active
+        if client and client.name == 'clangd' then
+          map('gh', '<CMD>ClangdSwitchSourceHeader<CR>', 'Switch to associated [h]eader file')
+        end
       end,
     })
 
