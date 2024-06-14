@@ -103,7 +103,8 @@ vim.keymap.set('n', '<leader>b', '<CMD>Bdelete<CR>', { desc = 'Delete buffer' })
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 -- Mappings for opening terminal splits horizontally and vertically
-vim.keymap.set('n', '<leader>tt', '<C-w>s8<C-w>-<cmd>terminal<CR>i', { desc = 'Create horizontal terminal split' })
+vim.keymap.set('n', '<leader>tt', '<cmd>terminal<CR>i', { desc = 'Open terminal in new buffer' })
+vim.keymap.set('n', '<leader>ts', '<C-w>s8<C-w>-<cmd>terminal<CR>i', { desc = 'Create horizontal terminal split' })
 vim.keymap.set('n', '<leader>tv', '<C-w>v25<C-w><<cmd>terminal<CR>i', { desc = 'Create vertical terminal split' })
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -119,6 +120,8 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- Make new tab
+vim.keymap.set('n', '<C-w>t', '<CMD>tabnew<CR>', { desc = 'New empty tab' })
 
 -- Open oil.nvim
 vim.keymap.set('n', '-', '<CMD>Oil --float<CR>', { desc = 'Open Parent Directory' })
