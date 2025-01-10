@@ -48,7 +48,9 @@ vim.opt.updatetime = 250
 
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
-vim.opt.timeoutlen = 300
+vim.opt.timeoutlen = 500
+-- Make mini.surround work
+vim.keymap.set({ 'n', 'x' }, 's', '<Nop>')
 
 -- Configure how new splits should be opened
 vim.opt.splitright = true
@@ -104,6 +106,7 @@ vim.keymap.set('n', '<leader>b', '<CMD>Bdelete<CR>', { desc = 'Delete buffer' })
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 -- Mappings for opening terminal splits horizontally and vertically
 vim.keymap.set('n', '<leader>tt', '<cmd>terminal<CR>i', { desc = 'Open terminal in new buffer' })
+vim.keymap.set('n', '<leader>tT', '<cmd>tabnew|terminal<CR>i', { desc = 'Open terminal in new tab' })
 vim.keymap.set('n', '<leader>ts', '<C-w>s8<C-w>-<cmd>terminal<CR>i', { desc = 'Create horizontal terminal split' })
 vim.keymap.set('n', '<leader>tv', '<C-w>v25<C-w><<cmd>terminal<CR>i', { desc = 'Create vertical terminal split' })
 -- TIP: Disable arrow keys in normal mode
@@ -125,6 +128,9 @@ vim.keymap.set('n', '<C-w>t', '<CMD>tabnew<CR>', { desc = 'New empty tab' })
 
 -- Open oil.nvim
 vim.keymap.set('n', '-', '<CMD>Oil --float<CR>', { desc = 'Open Parent Directory' })
+-- Run nabla.nvim
+vim.keymap.set('n', '<M-p>', '<CMD>lua require("nabla").popup()<CR>', { desc = 'Open nabla view' })
+
 -- [[ Basic Autocommands ]]
 
 -- Highlight when yanking (copying) text
@@ -151,6 +157,16 @@ vim.api.nvim_create_autocmd('BufEnter', {
     if vim.bo[bufnr].buftype == 'terminal' then
       vim.cmd 'startinsert'
     end
+  end,
+})
+
+-- Toggle Neorg TODO
+vim.api.nvim_create_autocmd('Filetype', {
+  desc = 'Toggle TODO Items in Neorg files',
+  group = vim.api.nvim_create_augroup('toggle-todo-neorg', { clear = true }),
+  pattern = 'norg',
+  callback = function()
+    vim.keymap.set('n', '<C-t>', '<Plug>(neorg.qol.todo-items.todo.task-cycle)', { buffer = true })
   end,
 })
 
